@@ -135,3 +135,7 @@ dmypy.json
 # virtual env
 venv/
 dev/
+
+
+# Amostras de excel
+amostras
