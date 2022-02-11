@@ -1,0 +1,9 @@
+asgiref==3.5.0
+Django==4.0.2
+django-bootstrap==0.2.4
+django-bootstrap-form==3.4
+et-xmlfile==1.1.0
+openpyxl==3.0.9
+pkg_resources==0.0.0
+python-dotenv==0.19.2
+sqlparse==0.4.2
