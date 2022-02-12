@@ -36,7 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.*'
+    'apps.core',
+    'apps.funcionario',
+    'apps.controle',
+    'apps.website',
 ]
 
 MIDDLEWARE = [
@@ -54,10 +57,11 @@ ROOT_URLCONF = 'controle_de_ponto.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['assets/templates'],
+        'DIRS': ['apps/assets/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'apps.core.context_processors.runtime_variable',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -94,9 +98,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = os.environ['DJANGO_LANGUAGE']
 
 TIME_ZONE = os.environ['TZ']
+
+DEFAULT_CHARSET = 'utf-8'
 
 USE_I18N = True
 
