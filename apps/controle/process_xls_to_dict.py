@@ -25,6 +25,7 @@ class ProcessadorXLS2Dict:
 
     def process(self):
 
+        pass
 
     def __str__(self):
         return json.dumps(self.builder) if not self.builder else ""
