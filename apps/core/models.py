@@ -44,7 +44,7 @@ class Planilha(models.Model):
 
 class Schedule(models.Model):
     sheet = models.ForeignKey(Planilha, on_delete=models.deletion.CASCADE, verbose_name="Planilha")
-    day = models.IntegerField(null=False, blank=False, validators=[ValidationOnlyDay()], verbose_name="Dia")
+    day = models.IntegerField(null=False, blank=False, validators=[ValidationOnlyDay(sheet.month)], verbose_name="Dia")
     invalid = models.BooleanField(default=False, verbose_name="É invalido")
 
     @property
