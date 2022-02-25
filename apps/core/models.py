@@ -24,7 +24,7 @@ class Employee(models.Model):
     department = models.CharField(max_length=20, verbose_name="Departamento")
 
 
-class Planilha(models.Model):
+class Sheet(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.deletion.CASCADE, verbose_name="Empregado")
     month = models.IntegerField(
         choices=MonthYear.choices,
@@ -43,7 +43,7 @@ class Planilha(models.Model):
 
 
 class Schedule(models.Model):
-    sheet = models.ForeignKey(Planilha, on_delete=models.deletion.CASCADE, verbose_name="Planilha")
+    sheet = models.ForeignKey(Sheet, on_delete=models.deletion.CASCADE, verbose_name="Planilha")
     day = models.IntegerField(null=False, blank=False, validators=[ValidationOnlyDay(sheet.month)], verbose_name="Dia")
     invalid = models.BooleanField(default=False, verbose_name="É invalido")
 
