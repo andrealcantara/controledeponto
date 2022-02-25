@@ -3,9 +3,10 @@ import json
 
 import pandas as p
 
-from apps.core.models import Employee
 
 SHEET_HORARIO = 1
+SIZE_HEADER = 2
+SIZE_ROWS_EMPOYLE = 3
 
 
 class ProcessadorXLS2Dict:
@@ -25,7 +26,10 @@ class ProcessadorXLS2Dict:
         self.__builder = json.loads(jason)
 
     def sz_columns_rows(self):
-        return self.__excel.shape
+        back = []
+        if self.__excel is not None:
+            back = list(self.__excel.shape)
+        return back
 
     def get_dict(self):
         if self.__builder:
@@ -52,6 +56,15 @@ class ProcessadorDict2Object:
 
 
     def parse_to_Employee(self):
+        dic = self.__proc.get_dict()
         sz = self.__proc.sz_columns_rows()
-        sz[0] -= 2
-        num_empoyler = sz[0] / 3
+        sz[0] -= SIZE_HEADER
+        count = 0
+        keys = dic.keys()
+        for key in keys:
+            count = SIZE_HEADER
+            for idx in range(0, sz[0], 3):
+                count += idx
+
+
+
