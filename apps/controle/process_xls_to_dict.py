@@ -59,12 +59,14 @@ class ProcessadorDict2Object:
         dic = self.__proc.get_dict()
         sz = self.__proc.sz_columns_rows()
         sz[0] -= SIZE_HEADER
-        count = 0
         keys = dic.keys()
+        employee = {}
         for key in keys:
             count = SIZE_HEADER
             for idx in range(0, sz[0], 3):
                 count += idx
+
+
 
 
 
