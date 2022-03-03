@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .validations import ValidationOnlyDay
+# from .validations import ValidationOnlyDay
 
 
 class MonthYear(models.IntegerChoices):
@@ -16,6 +16,13 @@ class MonthYear(models.IntegerChoices):
     OCT = 10, "Outubro"
     NOV = 11, "Novembro"
     DEC = 12, "Dezembro"
+
+    @staticmethod
+    def get_by_int(val):
+        rtn = list(item for item in MonthYear.__members__.values() if item.value == val)
+        if not rtn: # Quando estiver vazio adicionar None
+            rtn.append(None)
+        return rtn.pop()
 
 
 class Employee(models.Model):
@@ -44,7 +51,9 @@ class Sheet(models.Model):
 
 class Schedule(models.Model):
     sheet = models.ForeignKey(Sheet, on_delete=models.deletion.CASCADE, verbose_name="Planilha")
-    day = models.IntegerField(null=False, blank=False, validators=[ValidationOnlyDay(sheet.month)], verbose_name="Dia")
+    day = models.IntegerField(null=False, blank=False,
+                              # validators=[ValidationOnlyDay(sheet.month)],
+                              verbose_name="Dia")
     invalid = models.BooleanField(default=False, verbose_name="É invalido")
 
     @property
@@ -53,7 +62,8 @@ class Schedule(models.Model):
 
 
 class Hour(models.Model):
-    hour = models.TimeField(default=0, verbose_name="Hora")
+    hour = models.CharField(max_length=5, blank=True, null=False, verbose_name="Hora")
     schedule = models.ForeignKey(Schedule, on_delete=models.deletion.CASCADE, verbose_name="Planilha")
+
 
 
