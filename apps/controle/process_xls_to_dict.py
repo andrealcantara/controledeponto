@@ -4,7 +4,7 @@ import json
 import pandas as p
 from django.contrib.auth.models import User
 
-from apps.core.models import Employee, Sheet, MonthYear
+from apps.core.models import Employee, Sheet, MonthYear, Schedule, Hour
 
 _SHEET_HORARIO = 1
 _SIZE_HEADER = 2
@@ -83,15 +83,22 @@ class ProcessadorDict2Object:
         return employees
 
     def get_object(self, sheet_number=_SHEET_HORARIO):
-        employees = self._parse_to_structure_employee()
-        for row in employees:
+        employees_dict = self._parse_to_structure_employee()
+        employees = []
+        for row in employees_dict:
             user = User.objects.get_or_create(username=row["name"])[0]
             employee = Employee.objects.get_or_create(user=user, id_sheet_original=row["id"],
                                                       department=row["department"])[0]
-            sheet = Sheet.objects.get_or_create(employee=employee, month=MonthYear.get_by_int(self.get_month()))
-
-
-
+            employees.append(employee)
+            sheet = Sheet.objects.get_or_create(employee=employee, month=MonthYear.get_by_int(self.get_month()))[0]
+            for i in range(len(row["hours"])):
+                schedule = Schedule.objects.get_or_create(sheet=sheet, sheet_id=sheet.id, day=int(row['days'][i]))[0]
+                if row["hours"][i]:
+                    hours = row["hours"][i].strip().split("\n")
+                    for hour in (x for x in hours if not x.isspace()):
+                        Hour.objects.create(schedule=schedule, hour=hour[:5])
+                else:
+                    Hour.objects.create(schedule=schedule)
         pass
 
     def get_month(self):

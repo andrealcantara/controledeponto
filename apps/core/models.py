@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 # from .validations import ValidationOnlyDay
@@ -27,8 +29,11 @@ class MonthYear(models.IntegerChoices):
 
 class Employee(models.Model):
     user = models.OneToOneField(on_delete=models.deletion.CASCADE, to=User)
-    id_sheet_original = models.IntegerField(default=0, verbose_name="Id Planilha Original")
+    id_sheet_original = models.IntegerField(default=0, unique=True, verbose_name="Id Planilha Original")
     department = models.CharField(max_length=20, verbose_name="Departamento")
+
+    def __str__(self):
+        return "{} - {} - {}".format(self.user.username, self.id_sheet_original, self.department)
 
 
 class Sheet(models.Model):
@@ -37,16 +42,26 @@ class Sheet(models.Model):
         choices=MonthYear.choices,
         verbose_name="Mês")
 
+    def __str__(self):
+        return self.get_month_display()
+
     def __process_schedule(self):
-        invalids = self.schedule_set.filter(lambda sch: not len(sch.hour_set) % 2)
-        for invalid in invalids:
-            invalid.invalid = True
-            invalid.save()
+        for invalid in self.schedule_set.all():
+            if invalid.hour_set.count() % 2 and not invalid.invalid:
+                invalid.invalid = True
+                invalid.save()
+
+    @property
+    def has_invalid_schedule(self):
+        return self.schedule_set.contains(invalid=True)
 
     @property
     def total_schedule(self):
         self.__process_schedule()
-        return self.schedule_set.filter(invalido=False).aggregate(models.Sum('balance'))['balance__sum'] or 0
+        total = 0
+        for hour in self.schedule_set.all().filter(invalid=False).all():
+            total += hour.balance
+        return total
 
 
 class Schedule(models.Model):
@@ -56,14 +71,28 @@ class Schedule(models.Model):
                               verbose_name="Dia")
     invalid = models.BooleanField(default=False, verbose_name="É invalido")
 
+    def __str__(self):
+        return "{} - {}".format(self.day, self.invalid)
     @property
     def balance(self):
-        return self.hour_set.aggregate(models.Sum('hour'))['hour__sum'] or 0
+        entrada = 0
+        saida = 0
+        for idx, hour in enumerate(self.hour_set.all()):
+            if idx % 2:
+                saida += hour.hour_datetime.timestamp()
+            else:
+                entrada += hour.hour_datetime.timestamp()
+        return saida - entrada
 
 
 class Hour(models.Model):
-    hour = models.CharField(max_length=5, blank=True, null=False, verbose_name="Hora")
+    _MASK_HOUR = "%H:%M"
+    hour = models.CharField(max_length=5, default="0", null=False, verbose_name="Hora")
     schedule = models.ForeignKey(Schedule, on_delete=models.deletion.CASCADE, verbose_name="Planilha")
 
+    @property
+    def hour_datetime(self):
+        return datetime.datetime.strptime(self.hour, self._MASK_HOUR)
 
-
+    def __str__(self):
+        return self.hour_datetime
