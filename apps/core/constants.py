@@ -1,0 +1,14 @@
+SHEET_HORARIO = 1
+SIZE_HEADER = 2
+SIZE_ROWS_EMPOYLE = 3
+
+LABEL_DATA = "data"
+LABEL_HOUR = "hours"
+LABEL_DAYS = "days"
+
+STRUCTURE = "dict"
+SOURCE = "excel"
+
+LABEL_NAME = "name"
+LABEL_DEPARTMENT = "department"
+LABEL_ID = "id"
